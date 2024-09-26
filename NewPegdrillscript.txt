@@ -1,0 +1,68 @@
+# Define file paths
+input_file = r"C:\Users\JoJo\Documents\threading\19Dali\dali.txt"
+output_file = r"C:\Users\JoJo\Documents\threading\19Dali\Dalipegdrill.txt"
+
+# Conversion factor from mm to inches
+mm_to_inches = 0.0393701
+
+# Initialize variables for maximum x and y coordinates in inches
+max_x_inches = -float('inf')
+max_y_inches = -float('inf')
+all_coordinates = []
+
+# Open input file for reading
+with open(input_file, 'r') as f_input:
+    lines = f_input.readlines()
+
+# Convert all coordinates to inches and find maximum x and y coordinates
+for line in lines:
+    if line.strip().startswith("- PEG"):
+        # Extract x and y coordinates from line in mm
+        x_mm = float(line.split(';')[0].split('=')[1].strip())
+        y_mm = float(line.split(';')[1].split('=')[1].strip())
+        
+        # Convert to inches
+        x_inches = x_mm * mm_to_inches
+        y_inches = y_mm * mm_to_inches
+        
+        # Collect converted coordinates
+        all_coordinates.append((x_inches, y_inches))
+        
+        # Update maximum x and y coordinates if found
+        if x_inches > max_x_inches:
+            max_x_inches = x_inches
+        if y_inches > max_y_inches:
+            max_y_inches = y_inches
+
+# Calculate scaling factors
+if max_x_inches != 0:
+    scale_factor_x = 15 / max_x_inches
+else:
+    scale_factor_x = 1.0  # Default to no scaling if max_x_inches is 0 (should not happen ideally)
+
+if max_y_inches != 0:
+    scale_factor_y = 20 / max_y_inches
+else:
+    scale_factor_y = 1.0  # Default to no scaling if max_y_inches is 0 (should not happen ideally)
+
+# Open output file for writing
+with open(output_file, 'w') as f_output:
+    # Add text before the coordinates
+    f_output.write("G90\n")
+    f_output.write("G20\n")
+    f_output.write("G53\nM3\n")
+    
+    for x_inches, y_inches in all_coordinates:
+        # Scale coordinates and adjust all coordinates
+        x_scaled_inches = x_inches * scale_factor_x
+        y_scaled_inches = y_inches * scale_factor_y
+        
+        # Write coordinates with additional G-code commands to output file
+        f_output.write(f"X{x_scaled_inches:.2f} Y{y_scaled_inches:.2f}\nG0 Z0.1\nG1 Z-0.5 F20\nG0 Z0.2\n")
+    
+    # Add text after the coordinates
+    f_output.write("G53\n")
+    f_output.write("M5\n")
+    f_output.write("\n")
+
+print(f"G-code commands and scaled coordinates have been written to {output_file}.")
