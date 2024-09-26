@@ -7,3 +7,5 @@ offsets for each. the movement around the peg is a half circle going down .125" 
 tool raises .5" and moves to the next peg. Your Z zero is set just below the top of the peg. 
 
 the peg drill script drills holes for each peg .5" deep. the Z zero is set at the top of the material. 
+I intend to update pegdrill script but for now you must manually edit the directory path of the file
+you want to open and also the save directory path as well. my apologies. this is temporary. 
